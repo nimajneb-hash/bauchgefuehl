@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bauchgefühl</title>
+  <meta name="theme-color" content="#2f6f5e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bauchgefühl">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <!-- ERFASSEN -->
+    <section id="view-add" class="view active">
+      <header class="top"><h1>Bauchgefühl</h1></header>
+      <div id="reminder" class="banner hidden"></div>
+
+      <div class="seg" role="tablist">
+        <button class="seg-btn active" data-form="meal">🍽️ Gegessen</button>
+        <button class="seg-btn" data-form="sym">🩺 Wie geht's?</button>
+      </div>
+
+      <form id="form-meal" class="card form" autocomplete="off">
+        <textarea id="meal-text" rows="4" placeholder="Was hast du gegessen oder getrunken?&#10;Einfach reinsprechen: Feld antippen, dann 🎤 auf der Tastatur."></textarea>
+        <div id="meal-preview" class="chips"></div>
+        <button type="button" class="link" id="meal-add-item">＋ Zutat ergänzen</button>
+
+        <div class="label">Wann?</div>
+        <div class="chips time-chips" data-target="meal"></div>
+        <input type="datetime-local" id="meal-time" class="hidden">
+
+        <div class="photo-row">
+          <label class="btn ghost">📷 Foto <small>(optional)</small>
+            <input type="file" id="meal-photo" accept="image/*" hidden>
+          </label>
+          <div id="meal-photo-preview"></div>
+        </div>
+        <button type="submit" class="btn primary big">Speichern</button>
+      </form>
+
+      <form id="form-sym" class="card form hidden" autocomplete="off">
+        <div class="label">Beschwerdegrad</div>
+        <div class="sev-grid" id="sev-grid"></div>
+        <div class="label">Seit wann?</div>
+        <div class="chips time-chips" data-target="sym"></div>
+        <input type="datetime-local" id="sym-time" class="hidden">
+        <details class="details">
+          <summary>Details <small>(optional)</small></summary>
+          <div class="chips" id="sym-types"></div>
+          <textarea id="sym-note" rows="2" placeholder="Notiz (auch per Diktat)"></textarea>
+        </details>
+        <button type="submit" class="btn primary big">Speichern</button>
+        <p class="hint">Melde dich mindestens einmal am Tag, auch wenn alles gut ist (Grad 0). Nur so weiß die App, was du <em>gut</em> verträgst.</p>
+      </form>
+    </section>
+
+    <!-- VERLAUF -->
+    <section id="view-log" class="view">
+      <header class="top"><h1>Verlauf</h1></header>
+      <div id="log"></div>
+    </section>
+
+    <!-- AUSWERTUNG -->
+    <section id="view-stats" class="view">
+      <header class="top"><h1>Auswertung</h1></header>
+      <div class="card settings-row">
+        <label>Beschwerden zählen <select id="win-min">
+          <option value="0.5">ab 30 Min</option>
+          <option value="1">ab 1 Std</option>
+          <option value="2">ab 2 Std</option>
+        </select></label>
+        <label><select id="win-max">
+          <option value="6">bis 6 Std</option>
+          <option value="12">bis 12 Std</option>
+          <option value="24">bis 24 Std</option>
+          <option value="36">bis 36 Std</option>
+          <option value="48">bis 48 Std</option>
+        </select> nach dem Essen</label>
+      </div>
+      <div class="seg" id="stats-seg">
+        <button class="seg-btn active" data-mode="cats">Gruppen</button>
+        <button class="seg-btn" data-mode="foods">Lebensmittel</button>
+      </div>
+      <div id="stats"></div>
+    </section>
+
+    <!-- MEHR -->
+    <section id="view-more" class="view">
+      <header class="top"><h1>Mehr</h1></header>
+      <div class="card">
+        <h2>Datensicherung</h2>
+        <p class="muted">Alle Einträge liegen nur auf diesem Gerät. Sichere sie ab und zu als Datei, z. B. in iCloud Drive.</p>
+        <div class="row">
+          <button class="btn" id="export">⬇︎ Sicherung speichern</button>
+          <label class="btn ghost">⬆︎ Sicherung laden<input type="file" id="import" accept="application/json,.json" hidden></label>
+        </div>
+        <p class="muted small" id="backup-info"></p>
+      </div>
+      <div class="card">
+        <h2>Eigenes Wörterbuch</h2>
+        <p class="muted">Wörter, die du der App beigebracht hast.</p>
+        <div id="dict-list"></div>
+      </div>
+      <div class="card">
+        <h2>Auf den Homescreen</h2>
+        <p class="muted">In Safari: Teilen-Symbol → „Zum Home-Bildschirm“. Dann läuft die App wie eine normale App, auch offline.</p>
+        <p class="muted small" id="persist-info"></p>
+      </div>
+      <div class="card">
+        <h2>Hinweis</h2>
+        <p class="muted">Bauchgefühl hilft dir, Muster zu erkennen. Es ersetzt keine ärztliche Diagnose. Mit den Ergebnissen kannst du gut zur Ärztin oder zum Arzt bzw. in die Ernährungsberatung gehen.</p>
+      </div>
+      <div class="card danger-zone">
+        <button class="btn danger" id="wipe">Alle Daten löschen</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="add"><span>＋</span>Erfassen</button>
+    <button class="tab" data-view="log"><span>☰</span>Verlauf</button>
+    <button class="tab" data-view="stats"><span>◔</span>Auswertung</button>
+    <button class="tab" data-view="more"><span>⋯</span>Mehr</button>
+  </nav>
+
+  <dialog id="dlg"><form method="dialog" id="dlg-body"></form></dialog>
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
